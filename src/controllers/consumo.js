@@ -1,56 +1,124 @@
-const con = require('../db')
+const conexao = require('../db');
 
-const criarConsumo = (req, res) => {
-    const { usuarioId, local, equipamento, consumoKwh, mesReferencia, status } = req.body
-    const query = "INSERT INTO consumo (usuarioId, local, equipamento, consumoKwh, mesReferencia, status) VALUES (?, ?, ?, ?, ?, ?)"
 
-    con.query(query, [usuarioId, local, equipamento, consumoKwh, mesReferencia, status || 'Baixo'], (err, result) => {
-        if (err) return res.status(500).json({ erro: err.sqlMessage })
-        res.status(201).json({ mensagem: "Registro de consumo criado com sucesso!", id: result.insertId })
-    })
-}
+exports.cadastrar = (req, res) => {
+    const {
+        usuarioId,
+        local,
+        equipamento,
+        consumoKwh,
+        mesReferencia,
+        status
+    } = req.body;
 
-const listarConsumo = (req, res) => {
-    const query = `
-        SELECT c.id, c.local, c.equipamento, c.consumoKwh, c.mesReferencia, c.status, u.nome AS usuario 
-        FROM consumo c 
-        JOIN usuario u ON c.usuarioId = u.id
-    `
-    con.query(query, (err, result) => {
-        if (err) return res.status(500).json({ erro: err.sqlMessage })
-        res.json(result)
-    })
-}
+    const sql = `
+        INSERT INTO consumo
+        (usuarioId, local, equipamento, consumoKwh, mesReferencia, status)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
 
-const atualizarConsumo = (req, res) => {
-    const { id } = req.params
-    const { local, equipamento, consumoKwh, mesReferencia, status } = req.body
-    const query = "UPDATE consumo SET local = ?, equipamento = ?, consumoKwh = ?, mesReferencia = ?, status = ? WHERE id = ?"
+    conexao.query(sql, [
+        usuarioId,
+        local,
+        equipamento,
+        consumoKwh,
+        mesReferencia,
+        status
+    ], (erro, resultado) => {
+        if (erro) {
+            return res.status(500).json({ erro: erro.message });
+        }
 
-    con.query(query, [local, equipamento, consumoKwh, mesReferencia, status, id], (err, result) => {
-        if (err) return res.status(500).json({ erro: err.sqlMessage })
-        if (result.affectedRows === 0) return res.status(404).json({ mensagem: "Registro de consumo não encontrado." })
-        res.json({ mensagem: "Registro atualizado com sucesso!" })
-    })
-}
+        res.status(201).json({
+            mensagem: 'Consumo cadastrado com sucesso!',
+            id: resultado.insertId
+        });
+    });
+};
 
-const deletarConsumo = (req, res) => {
-    const { id } = req.params
-    const query = "DELETE FROM consumo WHERE id = ?"
+exports.listar = (req, res) => {
+    const sql = 'SELECT * FROM consumo';
 
-    con.query(query, [id], (err, result) => {
-        if (err) return res.status(500).json({ erro: err.sqlMessage })
-        if (result.affectedRows === 0) return res.status(404).json({ mensagem: "Registro de consumo não encontrado." })
-        res.json({ mensagem: "Registro removido com sucesso!" })
-    })
-}
+    conexao.query(sql, (erro, resultado) => {
+        if (erro) {
+            return res.status(500).json({ erro: erro.message });
+        }
 
-const resumoMedia = (req, res) => {
-    const query = "SELECT AVG(consumoKwh) AS mediaConsumoKwh FROM consumo"
-    con.query(query, (err, result) => {
-        if (err) return res.status(500).json({ erro: err.sqlMessage })
-        res.json(result[0])
-    })
-}
+        res.json(resultado);
+    });
+};
 
-module.exports = { criarConsumo, listarConsumo, atualizarConsumo, deletarConsumo, resumoMedia }
+
+exports.alterar = (req, res) => {
+    const { id } = req.params;
+
+    const {
+        usuarioId,
+        local,
+        equipamento,
+        consumoKwh,
+        mesReferencia,
+        status
+    } = req.body;
+
+    const sql = `
+        UPDATE consumo
+        SET usuarioId = ?, local = ?, equipamento = ?,
+        consumoKwh = ?, mesReferencia = ?, status = ?
+        WHERE id = ?
+    `;
+
+    conexao.query(sql, [
+        usuarioId,
+        local,
+        equipamento,
+        consumoKwh,
+        mesReferencia,
+        status,
+        id
+    ], (erro, resultado) => {
+        if (erro) {
+            return res.status(500).json({ erro: erro.message });
+        }
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Consumo não encontrado!' });
+        }
+
+        res.json({ mensagem: 'Consumo alterado com sucesso!' });
+    });
+};
+
+
+exports.excluir = (req, res) => {
+    const { id } = req.params;
+
+    const sql = 'DELETE FROM consumo WHERE id = ?';
+
+    conexao.query(sql, [id], (erro, resultado) => {
+        if (erro) {
+            return res.status(500).json({ erro: erro.message });
+        }
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Consumo não encontrado!' });
+        }
+
+        res.json({ mensagem: 'Consumo excluído com sucesso!' });
+    });
+};
+
+
+exports.media = (req, res) => {
+    const sql = 'SELECT AVG(consumoKwh) AS mediaConsumo FROM consumo';
+
+    conexao.query(sql, (erro, resultado) => {
+        if (erro) {
+            return res.status(500).json({ erro: erro.message });
+        }
+
+        res.json({
+            mediaConsumo: Number(resultado[0].mediaConsumo || 0)
+        });
+    });
+};

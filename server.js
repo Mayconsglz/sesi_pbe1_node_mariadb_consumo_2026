@@ -1,15 +1,17 @@
-const express = require("express")
-const cors = require("cors")
-const routes = require("./src/routes")
 
-const app = express()
+const express = require('express');
+const cors = require('cors');
+const routes = require('./src/routes');
 
-app.use(cors())
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
-app.use(routes)
+const app = express();
 
-const porta = 3000
+app.use(cors());
+app.use(express.json());
+
+app.use('/', routes);
+
+const porta = 3000;
+
 app.listen(porta, () => {
-    console.log(`Servidor respondendo em: http://localhost:${porta}`)
-})
+    console.log(`Servidor rodando na porta ${porta}`);
+});

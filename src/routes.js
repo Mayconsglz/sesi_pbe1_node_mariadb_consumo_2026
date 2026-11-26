@@ -1,29 +1,22 @@
-const express = require("express")
-const router = express.Router()
+const express = require('express');
+const usuario = require('./controllers/usuario');
+const consumo = require('./controllers/consumo');
 
-const usuarioController = require("./controllers/usuario")
-const consumoController = require("./controllers/consumo")
+const router = express.Router();
 
 router.get('/', (req, res) => {
-    res.json("Back-end de Consumo de Energia respondendo com sucesso!")
-})
+    res.send('API Energia funcionando!');
+});
 
-// [RF002] Login
-router.post('/login', usuarioController.login)
+router.post('/usuarios', usuario.cadastrar);
+router.get('/usuarios', usuario.listar);
+router.put('/usuarios/:id', usuario.alterar);
+router.delete('/usuarios/:id', usuario.excluir);
+router.post('/login', usuario.login);
+router.post('/consumos', consumo.cadastrar);
+router.get('/consumos', consumo.listar);
+router.put('/consumos/:id', consumo.alterar);
+router.delete('/consumos/:id', consumo.excluir);
+router.get('/consumos/media', consumo.media);
 
-// [RF001] CRUD de Usuários
-router.post('/usuarios', usuarioController.criarUsuario)
-router.get('/usuarios', usuarioController.listarUsuarios)
-router.put('/usuarios/:id', usuarioController.atualizarUsuario)
-router.delete('/usuarios/:id', usuarioController.deletarUsuario)
-
-// [RF004] Resumo (Média de consumo) - DEVE ficar antes das rotas com parâmetro dinâmico (:id)
-router.get('/consumo/resumo', consumoController.resumoMedia)
-
-// [RF003] CRUD de Consumo
-router.post('/consumo', consumoController.criarConsumo)
-router.get('/consumo', consumoController.listarConsumo)
-router.put('/consumo/:id', consumoController.atualizarConsumo)
-router.delete('/consumo/:id', consumoController.deletarConsumo)
-
-module.exports = router
+module.exports = router;

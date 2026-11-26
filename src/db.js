@@ -1,18 +1,20 @@
-const mysql = require('mysql')
 
-const connection = mysql.createConnection({
+const mysql = require('mysql2');
+
+const conexao = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '', // insira sua senha se houver
-    database: 'gestao_energia'
-})
+    password: '',
+    database: 'gestao_residuos'
+});
 
-connection.connect((err) => {
-    if (err) {
-        console.error('Erro ao conectar ao banco de dados:', err)
-        return
+conexao.connect((erro) => {
+    if (erro) {
+        console.log('Erro ao conectar com o banco:', erro);
+        return;
     }
-    console.log('Conectado ao MariaDB/MySQL com sucesso!')
-})
 
-module.exports = connection
+    console.log('Banco de dados conectado!');
+});
+
+module.exports = conexao;

@@ -34,3 +34,7 @@ insert into consumo(usuarioId, local, equipamento, consumoKwh, mesReferencia, st
 (2, 'Sala de aula do 1 ano B', 'Computador do professor', 45.1, '2026-09', 'Baixo'),
 (2, 'Sala de aula do 1 ano A', 'Ar condicionado', 190.1, '2026-09', 'Elevado'),
 (3, 'Sala de aula do 1 ano A', 'Projetor multimidia', 86.1, '2026-09', 'Normal');
+
+SELECT * FROM usuario;
+SELECT * FROM consumo;
+SHOW TABLES;
